@@ -38,6 +38,14 @@ public class ParticleSolver : MonoBehaviour
         Kernels.Dispatch(UpdateParticleIndex, ParticleCount, 1, 1);
     }
 
+    private void OnDestroy()
+    {
+        if (particleBuffer != null)
+            particleBuffer.Release();
+        if (forceBuffer != null)
+            forceBuffer.Release();
+    }
+
     private void CollectForces()
     {
         if (forceBuffer == null)
@@ -56,7 +64,7 @@ public class ParticleSolver : MonoBehaviour
         {
             particleArray[i].position = 2 * Random.onUnitSphere;
             particleArray[i].emission = particleArray[i].position;
-            
+
             particleArray[i].velocity.x = 0;
             particleArray[i].velocity.y = 0;
             particleArray[i].velocity.z = 0;

@@ -284,7 +284,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 3f4f191d4e8b7fe4b95dd63d26d41fcd, type: 2}
+  - {fileID: 2100000, guid: a152a46c8bb02f4499ffb9a84d5583ed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec1ce3a28bc7334daa96ed7923e029c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParticleCount: 100000
+  ParticleCount: 50000
   Kernels: {fileID: 7200000, guid: b27cb248bdad4d740a1e0e2748901f05, type: 3}
   ConstantVelocity: {x: 0, y: 0, z: 0}
   NoiseAmplitude: 0
@@ -390,7 +390,6 @@ MonoBehaviour:
   particleCount: 350000
   material: {fileID: 2100000, guid: 3f4f191d4e8b7fe4b95dd63d26d41fcd, type: 2}
   computeShader: {fileID: 7200000, guid: b27cb248bdad4d740a1e0e2748901f05, type: 3}
-  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!81 &1342416723
 AudioListener:
   m_ObjectHideFlags: 0
@@ -455,7 +454,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1342416721}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4.5}
+  m_LocalPosition: {x: 0, y: 0, z: -3.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

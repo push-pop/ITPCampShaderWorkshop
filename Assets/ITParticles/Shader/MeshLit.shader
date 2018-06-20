@@ -21,7 +21,7 @@ Shader "ITParticles/MeshLit"
 
 #include "RotationMatrix.hlsl"
 			#include "UnityCG.cginc"
-			
+#include "ColorSpaceConversion.hlsl"
 			// Particle's data
 			struct Particle
 			{
@@ -109,10 +109,13 @@ Shader "ITParticles/MeshLit"
 				position += _Scale * vert;
 
 				o = (Input)0;
-				
+				float hue = fmod(10 * _Time.x + v.id / 100 + 0.05, 1.0f);
+
+				float3 rgb = HUEtoRGB(hue);
+
 				// Color
-				v.color = float4(1, 0, 0, 1);
-				o.color = float4(1, 0, 0, 1);
+				v.color = float4(rgb,1);
+				//o.color = float4(position,1);
 				o.vel = p.velocity;
 				o.normal = norm;
 				// Position
@@ -125,7 +128,10 @@ Shader "ITParticles/MeshLit"
 			// Pixel shader
 			void surf(Input IN, inout SurfaceOutputStandard o)
 			{
-				o.Albedo = _ColorLow;
+				
+
+				o.Albedo = _ColorLow + fmod( _Time.xyz, 255.0)/255.0;
+				//o.Albedo = IN.color;
 				//o.Albedo = IN.vel*10;
 				//o.Albedo = max(length(IN.vel.rgb)*float3(.4,.4,1), IN.color.rgb);
 

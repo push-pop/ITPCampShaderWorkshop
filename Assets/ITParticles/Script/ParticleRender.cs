@@ -13,7 +13,6 @@ public class ParticleRender : MonoBehaviour
 
     MeshFilter meshFilter;
     Material mat;
-    private ComputeBuffer batchDrawArgs;
     private Mesh dummyMesh;
 
     // Use this for initialization
@@ -30,6 +29,12 @@ public class ParticleRender : MonoBehaviour
     private void Update()
     {
         UpdateMaterialProperties();
+    }
+
+    private void OnDestroy()
+    {
+        if (meshBuffer != null)
+            meshBuffer.Release();
     }
 
     private void UpdateMaterialProperties()
@@ -74,6 +79,8 @@ public class ParticleRender : MonoBehaviour
             uvs[i] = Vector2.zero;
             ind[i] = i;
         }
+
+        var topology = PerParticleMesh.GetTopology(0);
 
         dummyMesh.name = "Dummy Mesh with " + vCount + " Verts";
         dummyMesh.vertices = verts;

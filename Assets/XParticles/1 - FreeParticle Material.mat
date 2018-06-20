@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: 1 - FreeParticle Material
-  m_Shader: {fileID: 4800000, guid: 39ca4402d6d14b344a162475b69b1853, type: 3}
+  m_Shader: {fileID: 4800000, guid: 8df33d530383757478d1ab83de70e93e, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -23,8 +23,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _HighSpeedValue: 0.9
-    - _Scale: 0.138
+    - _HighSpeedValue: 43.2
+    - _Scale: 0.122
     - _colorSwitch: 60
     m_Colors:
     - _Angle: {r: 2.39, g: 0.36, b: 3.51, a: 1}
