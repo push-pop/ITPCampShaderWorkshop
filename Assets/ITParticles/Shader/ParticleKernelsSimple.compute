@@ -8,54 +8,33 @@ struct Particle
 	float3 velocity;
 };
 
-struct Force
-{
-	float3 center;
-	float range;
-	float falloff;
-	float power;
-};
 
 // Particle's data, shared with the shader
 RWStructuredBuffer<Particle> particleBuffer;
-RWStructuredBuffer<Force> forceBuffer;
-
 
 // Variables set from the CPU
 float deltaTime;
-float2 mousePosition;
 float3 constantVelocity;
-int forceCount;
-//
-//void EmitNewParticle(inout Particle p)
-//{
-//	p.position = p.emission;
-//	p.velocity = float3(0, 0, 0);
-//	p.life = 4;
-//}
+float3 center;
+float power;
 
 [numthreads(256, 1, 1)]
 void UpdateParticles(uint3 id : SV_DispatchThreadID) 
 {
 	Particle p = particleBuffer[id.x];
 
-	//if (p.life < 0)
-	//	EmitNewParticle(p); 
 
 	float3 velocity = constantVelocity;
-	for (int i = 0; i < forceCount; i++)
-	{
-		Force f = forceBuffer[i];
-		float3 dist = float3(f.center - p.position);
-		float3 dir = normalize(dist);
-		float sqlength = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
 
-		velocity += f.power*(smoothstep(0, f.range, pow(sqlength, f.falloff)))*dir;
-	}
+	float3 dist = float3(center - p.position);
+	float3 dir = normalize(dist);
+	float sqlength = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
+
+	velocity += power*(smoothstep(0, 1, pow(sqlength, 3)))*dir;
+	
 	float mag = length(velocity);
 	if(mag > 0)
 	  velocity = normalize(velocity) * min(mag, .01);
-
 
 	p.velocity += velocity;
 	p.position += p.velocity * deltaTime;
