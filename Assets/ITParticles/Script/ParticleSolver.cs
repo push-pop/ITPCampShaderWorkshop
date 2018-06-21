@@ -63,13 +63,13 @@ public class ParticleSolver : MonoBehaviour
         for (int i = 0; i < ParticleCount; ++i)
         {
             particleArray[i].position = 2 * Random.onUnitSphere;
-            particleArray[i].emission = particleArray[i].position;
+            //particleArray[i].emission = particleArray[i].position;
 
             particleArray[i].velocity.x = 0;
             particleArray[i].velocity.y = 0;
             particleArray[i].velocity.z = 0;
 
-            particleArray[i].life = Random.Range(3, 6);
+            //particleArray[i].life = Random.Range(3, 6);
         }
 
         particleBuffer = new ComputeBuffer(ParticleCount, Particle.stride);

@@ -14,10 +14,8 @@ public struct MeshData
 
 public struct Particle
 {
-    public Vector3 emission;
     public Vector3 position;
     public Vector3 velocity;
-    public float life;
 
-    public const int stride = 10 * sizeof(float);
+    public const int stride =6 * sizeof(float);
 }

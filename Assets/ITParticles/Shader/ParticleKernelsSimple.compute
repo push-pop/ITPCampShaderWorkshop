@@ -6,7 +6,6 @@ struct Particle
 {
 	float3 position;
 	float3 velocity;
-	float life;
 };
 
 
@@ -23,6 +22,7 @@ float power;
 void UpdateParticles(uint3 id : SV_DispatchThreadID) 
 {
 	Particle p = particleBuffer[id.x];
+
 
 	float3 velocity = constantVelocity;
 

@@ -28,11 +28,14 @@ public class ParticleSolverSimple : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyUp(KeyCode.Space)) {
+            CreateInitialPositions();
+        }
+
         Kernels.SetBuffer(UpdateParticleIndex, "particleBuffer", particleBuffer);
         Kernels.SetFloat("deltaTime", Time.deltaTime);
         Kernels.SetFloat("power", power);
         Kernels.SetVector("center", center);
-
         Kernels.SetVector("constantVelocity", ConstantVelocity);
         Kernels.Dispatch(UpdateParticleIndex, ParticleCount, 1, 1);
     }
