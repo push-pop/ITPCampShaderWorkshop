@@ -25,10 +25,10 @@ Shader "ITParticles/MeshLit"
 			// Particle's data
 			struct Particle
 			{
-				float3 emission;
+				//float3 emission;
 				float3 position;
 				float3 velocity;
-				float life;
+				//float life;
 			};
 			
 			// Mesh's data
