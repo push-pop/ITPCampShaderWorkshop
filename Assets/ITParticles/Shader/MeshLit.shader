@@ -59,8 +59,9 @@ Shader "ITParticles/MeshLit"
 				float3 normal : NORMAL;
 				float4 tangent : TANGENT;
 			};
-			
-#ifdef SHADER_API_D3D11
+	
+#define SUPPORTS_COMPUTE defined(SHADER_API_D3D11) || defined(SHADER_API_METAL) || defined(SHADER_API_VULKAN) || defined(SHADER_API_GLES3)
+#if SUPPORTS_COMPUTE
 
 			// Particle's data, shared with the compute shader
 			StructuredBuffer<Particle> particleBuffer;
@@ -83,7 +84,7 @@ Shader "ITParticles/MeshLit"
 			{
 				uint pIndex = v.id / MeshIndexCount;
 				uint mIndex = v.id % MeshIndexCount;
-#ifdef SHADER_API_D3D11
+#if SUPPORTS_COMPUTE
 
 				Particle p = particleBuffer[pIndex];
 				MeshData mesh = meshDataBuffer[meshDataBuffer[mIndex].index];
