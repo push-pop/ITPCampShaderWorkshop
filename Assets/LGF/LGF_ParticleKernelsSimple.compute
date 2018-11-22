@@ -1,0 +1,44 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel UpdateParticles
+
+// Particle's data
+struct Particle
+{
+	float3 position;
+	float3 velocity;
+};
+
+
+// Particle's data, shared with the shader
+RWStructuredBuffer<Particle> particleBuffer;
+
+// Variables set from the CPU
+float deltaTime;
+float3 constantVelocity;
+float3 center;
+float power;
+
+[numthreads(256, 1, 1)]
+void UpdateParticles(uint3 id : SV_DispatchThreadID) 
+{
+	Particle p = particleBuffer[id.x];
+
+
+	float3 velocity = constantVelocity;
+
+	float3 dist = float3(center - p.position);
+	float3 dir = normalize(dist);
+	float sqlength = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
+
+	velocity += power*(smoothstep(0, 1, pow(sqlength, 3)))*dir;
+	
+	float mag = length(velocity);
+	if(mag > 0)
+	  velocity = normalize(velocity) * min(mag, .01);
+
+	p.velocity += velocity;
+	p.position += p.velocity * deltaTime;
+
+	particleBuffer[id.x] = p;
+
+}
