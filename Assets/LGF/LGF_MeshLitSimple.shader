@@ -14,7 +14,7 @@ Shader "LGF/Simple"
 	{
 
 			//Blend SrcAlpha one
-			Cull Off
+			//Cull Off
 			CGPROGRAM
 			#pragma target 3.5
 #pragma surface surf Standard addshadow fullforwardshadows vertex:vert  
@@ -33,6 +33,7 @@ Shader "LGF/Simple"
 			struct MeshData
 			{
 				//float4x4 mat;
+				float3 gNorm;
 				float3	vert;
 				float2	uv;
 				int		index;
@@ -90,13 +91,14 @@ Shader "LGF/Simple"
 
 				float3 vert = mesh.vert;
 				float3 norm = mesh.norm;
+				float gNorm = mesh.gNorm;
 
 				//float3 v1 = _Angle.xyz;// float3(0, 0, 0);
 				//float3 v2 = normalize(norm);// p.velocity);
 				//float angle = acos(dot(v2, v1));
 				//angle = _Angle.w;// _Time.y;
 				//float3 axis = normalize(cross(v2, v1));
-				float3 axis = norm;// float3(0, 0, 1);
+				float3 axis =  gNorm;// float3(0, 0, 1);
 				float3x3 rot = rotationMatrix(axis, _Angle.w);
 
 
@@ -106,7 +108,7 @@ Shader "LGF/Simple"
 					norm = mul(transpose(rot), mesh.norm);
 				//}
 				float3 position = p.position;
-				vert += norm * _Angle.x;
+				vert += gNorm * _Angle.x;
 
 				position += _Scale * vert;
 
@@ -116,7 +118,7 @@ Shader "LGF/Simple"
 				float3 rgb = HUEtoRGB(hue);
 
 				// Color
-				v.color = float4(rgb,1);
+				//v.color = float4(rgb,1);
 				//o.color = float4(position,1);
 				o.vel = p.velocity;
 				o.normal = norm;
@@ -132,7 +134,7 @@ Shader "LGF/Simple"
 			{
 				
 
-				o.Albedo = fixed4(1, 1, 1, 1);// _ColorLow + fmod(_Time.xyz, 255.0) / 255.0;
+				o.Albedo = IN.color;// fixed4(1, 1, 1, 1);// _ColorLow + fmod(_Time.xyz, 255.0) / 255.0;
 				//o.Albedo = IN.color;
 				//o.Albedo = IN.vel*10;
 				//o.Albedo = max(length(IN.vel.rgb)*float3(.4,.4,1), IN.color.rgb);

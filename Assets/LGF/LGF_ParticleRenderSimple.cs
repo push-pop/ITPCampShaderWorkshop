@@ -7,12 +7,13 @@ public class LGF_ParticleRenderSimple : MonoBehaviour
 {
 
     public struct MeshData {
+        public Vector3 gNorm;
         public Vector3 vert;
         public Vector2 uv;
         public int index;
         public Vector3 normal;
         //public Matrix4x4 mat;
-        public const int stride = (8) * sizeof(float) + sizeof(int);
+        public const int stride = (11) * sizeof(float) + sizeof(int);
     }
 
 
@@ -28,9 +29,11 @@ public class LGF_ParticleRenderSimple : MonoBehaviour
     Material mat;
     private Mesh dummyMesh;
 
+    Vector3[] gNorm;
     // Use this for initialization
     void Start()
     {
+      
         meshFilter = GetComponent<MeshFilter>();
         mat = GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -76,8 +79,24 @@ public class LGF_ParticleRenderSimple : MonoBehaviour
         for (int i = 0; i < InputMesh.normals.Length; i++)
             meshDatarr[i].normal = InputMesh.normals[i];
 
+        int q = 0;
+        for (int i = 0; i < InputMesh.normals.Length; i++) {
+            
+            meshDatarr[i].gNorm = InputMesh.normals[q];
+            if (i > 0 && i % 12 == 0)
+                q += 12;
+
+        }
+
         meshBuffer = new ComputeBuffer(meshDatarr.Length, MeshData.stride);
         meshBuffer.SetData(meshDatarr);
+    }
+
+    Vector3 GetNormal(Vector3 a, Vector3 b, Vector3 c) {
+
+        Vector3 A = b - a;
+        Vector3 B = c - a;
+        return Vector3.Cross(A, B);
     }
 
     private Mesh CreateDummyMesh()
@@ -89,47 +108,60 @@ public class LGF_ParticleRenderSimple : MonoBehaviour
         var norm = new Vector3[vCount];
         var uvs = new Vector2[vCount];
         var ind = new int[vCount];
+        var colors = new Color[vCount];
+        gNorm = new Vector3[vCount];
 
         dummyMesh = new Mesh();
 
         int c = 0;
         Vector3 avg = Vector3.zero;
 
+        for (int i = 0; i < colors.Length; i++) {
+            colors[i] = Random.ColorHSV();
+        }
+
         int q = 0;
         for (int i = 0; i < InputMesh.triangles.Length; i+=3)
         {
-
+           
             if (i % 3 == 0) {
                 avg = GetAverage(InputMesh.vertices[InputMesh.triangles[c]], InputMesh.vertices[InputMesh.triangles[c + 1]], InputMesh.vertices[InputMesh.triangles[c + 2]]);
+                Vector3 N = GetNormal(InputMesh.vertices[InputMesh.triangles[c]], InputMesh.vertices[InputMesh.triangles[c + 1]], InputMesh.vertices[InputMesh.triangles[c + 2]]);
+
                 Vector3 v = avg;// + InputMesh.normals[InputMesh.triangles[c]]*.001f;
                 c += 3;
 
 
                 verts[q] = InputMesh.vertices[InputMesh.triangles[i]] - avg;
-                norm[q] = InputMesh.normals[InputMesh.triangles[i]];
+                norm[q] = N;// InputMesh.normals[InputMesh.triangles[i]];
                 uvs[q] = Vector2.zero;
-                ind[q] = i;
+                ind[q] = q;
+                gNorm[q] = N;
                 q += 1;
 
                 verts[q] = InputMesh.vertices[InputMesh.triangles[i+1]] - avg;
-                norm[q] = InputMesh.normals[InputMesh.triangles[i+1]];
+                norm[q] = N;// InputMesh.normals[InputMesh.triangles[i+1]];
                 uvs[q] = Vector2.zero;
-                ind[q] = i;
+                ind[q] = q;
+                gNorm[q] = N;
                 q += 1;
 
                 verts[q] = InputMesh.vertices[InputMesh.triangles[i+2]] - avg;
-                norm[q] = InputMesh.normals[InputMesh.triangles[i+2]];
+                norm[q] = N;// InputMesh.normals[InputMesh.triangles[i+2]];
                 uvs[q] = Vector2.zero;
-                ind[q] = i;
+                ind[q] = q;
+                gNorm[q] = N;
                 q += 1;
 
                 int p = 0;
 
                 for (int j = 0; j < 3; j++) {
+
                     verts[q] = InputMesh.vertices[InputMesh.triangles[i+p]] - avg;
                     norm[q] = InputMesh.normals[InputMesh.triangles[i]];
                     uvs[q] = Vector2.zero;
                     ind[q] = q;
+                    gNorm[q] = N;
                     p += 1;
                     if (p > 2)
                         p = 0;
@@ -138,15 +170,32 @@ public class LGF_ParticleRenderSimple : MonoBehaviour
                     norm[q] = InputMesh.normals[InputMesh.triangles[i]];
                     uvs[q] = Vector2.zero;
                     ind[q] = q;
+                    gNorm[q] = N;
                     p += 1;
                     if (p > 2)
                         p = 0;
                     q += 1;
-                    verts[q] = v-avg*.9f;
+                    verts[q] = InputMesh.normals[InputMesh.triangles[i]]*-.05f;
                     norm[q] = InputMesh.normals[InputMesh.triangles[i]];
                     uvs[q] = Vector2.zero;
                     ind[q] = q;
+                    gNorm[q] = N;
+
+                    //reverse
+                    Vector3 temp = verts[q - 1];
+
+                    verts[q - 1] = verts[q - 2];
+                    verts[q - 2] = temp;
+
                     q += 1;
+
+
+                   
+
+                    N = GetNormal(verts[q - 1], verts[q - 2], verts[q - 3]);
+                    norm[q - 1] = N;
+                    norm[q - 2] = N;
+                    norm[q - 3] = N;
 
 
                 }
@@ -159,6 +208,7 @@ public class LGF_ParticleRenderSimple : MonoBehaviour
         dummyMesh.name = "Dummy Mesh with " + vCount + " Verts";
         dummyMesh.vertices = verts;
         dummyMesh.normals = norm;
+        dummyMesh.colors = colors;
         dummyMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         dummyMesh.SetIndices(ind, MeshTopology.Triangles, 0);
         dummyMesh.bounds = new Bounds(Vector3.zero, new Vector3(1000, 1000, 1000));
