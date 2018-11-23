@@ -6,8 +6,10 @@ Shader "LGF/Simple"
 		_ColorLow ("Color Slow Speed", Color) = (0, 0, 0.5, 0.3)
 		_ColorHigh ("Color High Speed", Color) = (1, 0, 0, 0.3)
 		_HighSpeedValue ("High speed Value", Range(0, 50)) = 25
-		_Scale ("Particle Scale", Range(0.001, 1)) = 0.05
+		_Scale ("Particle Scale", Range(0.001, 3)) = 0.05
 		_Angle("Angle", Vector) = (0,0,0,0)
+		_Cube("Cubemap", CUBE) = "" {}
+
 	}
 
 	SubShader 
@@ -47,6 +49,8 @@ Shader "LGF/Simple"
 				float4 color : COLOR;
 				float3 vel : TEXCOORD0;
 				float3 normal : NORMAL;
+				float3 worldRefl;
+
 			};
 
 			struct appdata {
@@ -70,7 +74,8 @@ Shader "LGF/Simple"
 			uniform float4 _ColorLow;
 			uniform float4 _ColorHigh;
 			uniform float _HighSpeedValue;
-			
+			samplerCUBE _Cube;
+
 			float _Scale;
 			float4 _Angle;
 
@@ -91,7 +96,7 @@ Shader "LGF/Simple"
 
 				float3 vert = mesh.vert;
 				float3 norm = mesh.norm;
-				float gNorm = mesh.gNorm;
+				float3 gNorm = mesh.gNorm;
 
 				//float3 v1 = _Angle.xyz;// float3(0, 0, 0);
 				//float3 v2 = normalize(norm);// p.velocity);
@@ -105,11 +110,11 @@ Shader "LGF/Simple"
 
 				//if (angle > 0.001) {
 					vert = mul(rot, vert);
-					norm = mul(transpose(rot), mesh.norm);
+					norm = mul((rot), mesh.norm);
 				//}
 				float3 position = p.position;
-				vert += gNorm * _Angle.x;
-
+				position += gNorm * _Angle.x * sin(_Angle.z*_Time.z+pIndex*.1);
+				position += _Angle.y * (mesh.uv.x) * mesh.gNorm;
 				position += _Scale * vert;
 
 				o = (Input)0;
@@ -118,8 +123,8 @@ Shader "LGF/Simple"
 				float3 rgb = HUEtoRGB(hue);
 
 				// Color
-				//v.color = float4(rgb,1);
-				//o.color = float4(position,1);
+				v.color = lerp(v.color, v.color*.4, mesh.uv.x);
+				o.color = mesh.uv.x;// lerp(v.color, float4(0, 0, 0, 1), mesh.uv.x);// float4(position, 1);
 				o.vel = p.velocity;
 				o.normal = norm;
 				// Position
@@ -134,10 +139,11 @@ Shader "LGF/Simple"
 			{
 				
 
-				o.Albedo = IN.color;// fixed4(1, 1, 1, 1);// _ColorLow + fmod(_Time.xyz, 255.0) / 255.0;
+				o.Albedo = IN.color + (IN.color * texCUBE(_Cube, IN.worldRefl).rgb);// lerp(IN.color, fixed4(1, 1, 1, 1), .5);// _ColorLow + fmod(_Time.xyz, 255.0) / 255.0;
 				//o.Albedo = IN.color;
 				//o.Albedo = IN.vel*10;
 				//o.Albedo = max(length(IN.vel.rgb)*float3(.4,.4,1), IN.color.rgb);
+				//o.Emission = texCUBE(_Cube, IN.worldRefl).rgb;
 
 				o.Smoothness = 1;
 				o.Metallic = .3;
